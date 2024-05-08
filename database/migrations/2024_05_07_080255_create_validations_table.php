@@ -13,6 +13,19 @@ return new class extends Migration
     {
         Schema::create('validations', function (Blueprint $table) {
             //add table field for valid_format, is_deliverable , no_catch_all , valid_domain, is generic , is_spam
+            // other field could include status , results and email
+            //this is the most likely outlook
+            //{
+            //    "collectionName": "emails",
+            //    "email": "koskeyhoward@gmail.com",
+            //    "isv_domain": true,
+            //    "isv_format": true,
+            //    "isv_mx": true,
+            //    "isv_noblock": true,
+            //    "isv_nocatchall": true,
+            //    "isv_nogeneric": true,
+            //    "score": 90,
+            //}
             $table->id();
             $table->timestamps();
         });
