@@ -27,7 +27,16 @@ return new class extends Migration
             //    "score": 90,
             //}
             $table->id();
+            $table->string('email')->unique();
+            $table->integer('results');
+            $table->boolean('format');
+            $table->boolean('catchall');
+            $table->boolean('domain');
+            $table->boolean('noblock');
+            $table->boolean('nogeneric');
+            $table->string('status');
             $table->timestamps();
+
         });
     }
 
