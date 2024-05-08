@@ -12,6 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('validations', function (Blueprint $table) {
+            //add table field for valid_format, is_deliverable , no_catch_all , valid_domain, is generic , is_spam
             $table->id();
             $table->timestamps();
         });
