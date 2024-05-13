@@ -54,4 +54,43 @@ class ValidationController extends Controller
         // Return to the home view with the validation instance
         return view('home', compact('validation'));
     }
+
+
+    // Method To validate email via api
+    public function validateEmailViaApi(Request $request)
+    {
+        // Add logic to validate that the input provided is an email
+        // and check for the other params e.g format, domain etc
+        // Ultimately store/update based on your findings
+        // and return to a results view
+
+        $request->validate([
+            'email' => ['required', 'email'],
+        ]);
+
+        // Extract the validated email from the request
+        $email = $request->input('email');
+
+        // Save the email to the database
+        $validation = new Validation;
+        $validation->email = $email;
+        $validation->save();
+
+        // Perform additional checks, e.g., domain validation
+        // Get the domain from the email address
+        $domain = substr(strrchr($validation->email, "@"), 1);
+
+        // Check if the domain has valid DNS records
+        $domainStatus =  checkdnsrr($domain);
+
+        // Save domain status
+        $validation->domain = $domainStatus;
+        $validation->save();
+
+        // Continue with other checks and finally save the validation instance
+        // $validation->save();
+
+        // Return to json response with the validation instance
+        return response()->json(['validation' => $validation]);
+    }
 }

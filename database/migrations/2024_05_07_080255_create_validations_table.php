@@ -15,11 +15,11 @@ return new class extends Migration
 
             $table->id();
             $table->string('email')->unique();
-            $table->boolean('format');
-            $table->boolean('catchall');
-            $table->boolean('domain');
-            $table->boolean('noblock');
-            $table->boolean('nogeneric');
+            $table->boolean('format')->default(false);
+            $table->boolean('catchall')->default(false);
+            $table->boolean('domain')->default(false);
+            $table->boolean('noblock')->default(false);
+            $table->boolean('nogeneric')->default(false);
             $table->string('status')->nullable();
             $table->integer('results')->default(0);
             $table->timestamps();
