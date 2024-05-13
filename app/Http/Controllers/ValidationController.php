@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Validation;
 use Illuminate\Http\Request;
 
 class ValidationController extends Controller
@@ -23,11 +24,27 @@ class ValidationController extends Controller
 
 
         //trying to save the email
-        $validation = new Validation;// Editing from here
-
+        $validation = new Validation;
         $validation->email = $email;
         $validation->save();
 
-         return view('results')->with('email', $email);
+        //Todo use the saved emails model instance to process it for the other considerations e.g domain
+        //example
+
+        //check for domain
+
+        // Get the domain from the email address
+        $domain = substr(strrchr($validation->email, "@"), 1);
+
+        // Check if the domain has valid DNS records
+        $domainStatus =  checkdnsrr($domain);
+
+        //save domain status
+        $validation->domain = $domainStatus;
+
+
+        //continue with the other checks then finally do $validation->save();
+
+         return view('home',compact('validation'));
     }
 }
