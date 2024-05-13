@@ -11,40 +11,46 @@ class ValidationController extends Controller
     //Todo create a method called validateEmail, it uses Request and accepts email address only
     // create a results view
     //create a route
-    public function validateEmail(Request $request){
 
-        //add logic to validate that the input provided is an email
-        // check for the other params e.g format, domain etc
-        // ultimately  store/update based on your finding
-        //return to a results view
+    /**
+     * Validate an email address and store/update based on the findings.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\View\View
+     */
+    public function validateEmail(Request $request)
+    {
+        // Add logic to validate that the input provided is an email
+        // and check for the other params e.g format, domain etc
+        // Ultimately store/update based on your findings
+        // and return to a results view
+
         $request->validate([
             'email' => ['required', 'email'],
         ]);
-        $email = $request->input('email');//Trying to access the validated email
 
+        // Extract the validated email from the request
+        $email = $request->input('email');
 
-        //trying to save the email
+        // Save the email to the database
         $validation = new Validation;
         $validation->email = $email;
         $validation->save();
 
-        //Todo use the saved emails model instance to process it for the other considerations e.g domain
-        //example
-
-        //check for domain
-
+        // Perform additional checks, e.g., domain validation
         // Get the domain from the email address
         $domain = substr(strrchr($validation->email, "@"), 1);
 
         // Check if the domain has valid DNS records
         $domainStatus =  checkdnsrr($domain);
 
-        //save domain status
+        // Save domain status
         $validation->domain = $domainStatus;
 
+        // Continue with other checks and finally save the validation instance
+        // $validation->save();
 
-        //continue with the other checks then finally do $validation->save();
-
-         return view('home',compact('validation'));
+        // Return to the home view with the validation instance
+        return view('home', compact('validation'));
     }
 }
