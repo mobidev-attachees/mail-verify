@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Validation;
 use Illuminate\Http\Request;
+use Illuminate\View\View;
 
 class ValidationController extends Controller
 {
@@ -15,8 +16,8 @@ class ValidationController extends Controller
     /**
      * Validate an email address and store/update based on the findings.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\View\View
+     * @param Request $request
+     * @return View
      */
     public function validateEmail(Request $request)
     {
