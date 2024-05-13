@@ -16,5 +16,18 @@ class ValidationController extends Controller
         // check for the other params e.g format, domain etc
         // ultimately  store/update based on your finding
         //return to a results view
+        $request->validate([
+            'email' => ['required', 'email'],
+        ]);
+        $email = $request->input('email');//Trying to access the validated email
+
+
+        //trying to save the email
+        $validation = new Validation;// Editing from here
+
+        $validation->email = $email;
+        $validation->save();
+
+         return view('results')->with('email', $email);
     }
 }
