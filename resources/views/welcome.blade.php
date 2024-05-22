@@ -15,7 +15,7 @@
                 </p>
             </div>
             <div class="col p-3" style="border-style: solid; border-width: 1px;border-radius: 30px;margin:auto;width: 100%;padding-bottom: 50px;">
-                <form method="POST" action="">
+                <form method="POST" action="{{route('validate.api.mail')}}" id="validateEmailViaApi">
                     @csrf
                     <div class="row mb-3 ">
                         <label for="email" class="col-md-4 col-form-label text-md-end">{{ __('Email Address') }}</label>
@@ -37,6 +37,8 @@
                         </div>
                     </div>
                 </form>
+                
+                <div id="cf-response-message"></div>
                 <br>
                 <hr style="height:2px;border-width:0;color:gray;background-color:blue;">
                 <div>
@@ -123,5 +125,48 @@
         </div>
     </div>
 </div>
+
+
+<script>
+ $(document).ready(function() {
+    $('#validateEmailViaApi').submit(function(e) {
+        e.preventDefault();
+
+        // Serialize the form data
+        const formData = $(this).serialize();
+        
+        // Send an AJAX request
+        $.ajax({
+            type: 'POST',
+            url: '{{ route('validate.api.mail') }}',
+            data: formData,
+            dataType: 'json',
+            success: function(response) {
+                // Check if the response contains the validation data
+                if (response.validation) {
+                    // Access the validation object from the response
+                    const validation = response.validation;
+
+                    // Display different messages based on validation result
+                    if (validation.format && validation.domain && validation.noblock && validation.nogeneric) {
+                        $('#cf-response-message').html('<p>Email is valid.</p>');
+                    } else {
+                        $('#cf-response-message').html('<p>Email is invalid.</p>');
+                    }
+                } else {
+                    // Handle the case where the validation data is missing
+                    $('#cf-response-message').text('Validation data not found in the response.');
+                }
+            },
+            error: function(xhr, status, error) {
+                // Handle errors if needed
+                console.error(xhr.responseText);
+            }
+        });
+    });
+});
+
+</script>
+
 
 @endsection
