@@ -15,30 +15,59 @@
                 </p>
             </div>
             <div class="col p-3" style="border-style: solid; border-width: 1px;border-radius: 30px;margin:auto;width: 100%;padding-bottom: 50px;">
-                <form method="POST" action="{{route('validate.api.mail')}}" id="validateEmailViaApi">
+                <form method="POST" action="{{ route('validate.api.mail') }}" id="validateEmailViaApi">
                     @csrf
-                    <div class="row mb-3 ">
+                    <div class="row mb-3">
                         <label for="email" class="col-md-4 col-form-label text-md-end">{{ __('Email Address') }}</label>
-
                         <div class="col-md-5">
-                            <input id="email" type="email" class="form-control @error('email') is-invalid @enderror" name="email" value="{{ old('email') }}" required autocomplete="email" autofocus>
-
+                            <input id="email" type="email" class="form-control" name="email" value="{{ old('email') }}" required autocomplete="email" autofocus>
                             @error('email')
                                 <span class="invalid-feedback" role="alert">
                                     <strong>{{ $message }}</strong>
                                 </span>
                             @enderror
                         </div>
-                        
                         <div class="col-md-3">
                             <button type="submit" class="btn btn-primary">
-                                {{ __('check') }}
+                                {{ __('Check') }}
                             </button>
                         </div>
                     </div>
                 </form>
-                
                 <div id="cf-response-message"></div>
+                <div class="row">
+                    <div class="col">
+                        <i id="format-icon" class="fas"></i>
+                        <span id="format-message"></span>
+                        <div class="collapse multi-collapse" id="format-collapse">
+                            <div class="card card-body" id="format-card"></div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <i id="domain-icon" class="fas"></i>
+                        <span id="domain-message"></span>
+                        <div class="collapse multi-collapse" id="domain-collapse">
+                            <div class="card card-body" id="domain-card"></div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <i id="nogeneric-icon" class="fas"></i>
+                        <span id="nogeneric-message"></span>
+                        <div class="collapse multi-collapse" id="nogeneric-collapse">
+                            <div class="card card-body" id="nogeneric-card"></div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <i id="noblock-icon" class="fas"></i>
+                        <span id="noblock-message"></span>
+                        <div class="collapse multi-collapse" id="noblock-collapse">
+                            <div class="card card-body" id="noblock-card"></div>
+                        </div>
+                    </div>
+                </div>
+                <div id="cf-response-message"></div>
+
+
                 <br>
                 <hr style="height:2px;border-width:0;color:gray;background-color:blue;">
                 <div>
@@ -128,43 +157,77 @@
 
 
 <script>
- $(document).ready(function() {
-    $('#validateEmailViaApi').submit(function(e) {
-        e.preventDefault();
+document.addEventListener("DOMContentLoaded", function() {
+    document.getElementById("validateEmailViaApi").addEventListener("submit", function(event) {
+        event.preventDefault();
 
-        // Serialize the form data
-        const formData = $(this).serialize();
-        
-        // Send an AJAX request
-        $.ajax({
-            type: 'POST',
-            url: '{{ route('validate.api.mail') }}',
-            data: formData,
-            dataType: 'json',
-            success: function(response) {
-                // Check if the response contains the validation data
-                if (response.validation) {
-                    // Access the validation object from the response
-                    const validation = response.validation;
+        const formData = new FormData(this);
 
-                    // Display different messages based on validation result
-                    if (validation.format && validation.domain && validation.noblock && validation.nogeneric) {
-                        $('#cf-response-message').html('<p>Email is valid.</p>');
-                    } else {
-                        $('#cf-response-message').html('<p>Email is invalid.</p>');
-                    }
-                } else {
-                    // Handle the case where the validation data is missing
-                    $('#cf-response-message').text('Validation data not found in the response.');
-                }
-            },
-            error: function(xhr, status, error) {
-                // Handle errors if needed
-                console.error(xhr.responseText);
+        fetch('{{ route('validate.api.mail') }}', {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'Accept': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value
             }
+        })
+        .then(response => {
+            if (!response.ok) {
+                return response.text().then(text => { throw new Error(text); });
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.validation) {
+                const validation = data.validation;
+
+                // Update Format section
+                updateValidationSection("format", validation.format, "Valid format", "Invalid format", "It appears to be formatted correctly and follows the structure of an email address.", "The email address is not formatted correctly.");
+
+                // Update Domain section
+                updateValidationSection("domain", validation.domain, "Valid domain", "Invalid domain", "The domain of the email address is valid and has a valid DNS record.", "The domain of the email address is invalid or does not have a valid DNS record.");
+
+                // Update No Generic section
+                updateValidationSection("nogeneric", validation.nogeneric, "No Generic", "Generic", "The email address does not seem to be a generic email address, such as support@, info@, or contact@.", "The email address is from a generic domain.");
+
+                // Update No Block section
+                updateValidationSection("noblock", validation.noblock, "Not Blocked", "Blocked", "The email address is not blocklisted in our database of known spam email addresses.", "The email address is blocklisted.");
+
+                // Show response message
+                document.getElementById("cf-response-message").innerText = `Validation Results: ${validation.results}%`;
+
+            } else {
+                document.getElementById("cf-response-message").innerText = 'Validation data not found in the response.';
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            document.getElementById("cf-response-message").innerText = 'An error occurred. Please try again later.';
         });
     });
+
+    function updateValidationSection(section, isValid, validText, invalidText, validDesc, invalidDesc) {
+        const icon = document.getElementById(`${section}-icon`);
+        const message = document.getElementById(`${section}-message`);
+        const card = document.getElementById(`${section}-card`);
+        const collapse = $(`#${section}-collapse`);
+
+        if (isValid) {
+            icon.classList.add("fa-check");
+            icon.classList.remove("fa-times");
+            message.textContent = validText;
+            card.textContent = validDesc;
+        } else {
+            icon.classList.add("fa-times");
+            icon.classList.remove("fa-check");
+            message.textContent = invalidText;
+            card.textContent = invalidDesc;
+        }
+
+        collapse.collapse('show');
+    }
 });
+
 
 </script>
 

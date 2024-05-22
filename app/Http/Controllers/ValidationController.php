@@ -60,82 +60,79 @@ class ValidationController extends Controller
 
 
     public function validateEmailViaApi(Request $request)
-{
-    // Validate that the input provided is an email
-    $request->validate([
-        'email' => ['required', 'email'],
-    ]);
+    {
+        try {
+            // Validate that the input provided is an email
+            $request->validate([
+                'email' => ['required', 'email'],
+            ]);
 
-    // Extract the validated email from the request
-    $email = $request->input('email');
+            // Extract the validated email from the request
+            $email = $request->input('email');
 
-    // Get the domain from the email address
-    $domain = substr(strrchr($email, "@"), 1);
+            // Get the domain from the email address
+            $domain = substr(strrchr($email, "@"), 1);
 
-    // Check if the domain has valid DNS records
-    $domainStatus = checkdnsrr($domain, "MX");
+            // Check if the domain has valid DNS records
+            $domainStatus = checkdnsrr($domain, "MX");
 
-    // Check if the email is from a generic domain
-    $nogeneric = !$this->isGenericEmail($domain);
+            // Check if the email is from a generic domain
+            $nogeneric = !$this->isGenericEmail($domain);
 
-    // Check if the email is blocked
-    $isBlocked = !$this->isEmailBlocked($email);
+            // Check if the email is blocked
+            $isBlocked = !$this->isEmailBlocked($email);
 
-    // Create a new Validation instance and set attributes
-    $validation = new Validation;
-    $validation->email = $email;
-    $validation->format = true; // Assuming format validation is true
-    $validation->domain = $domainStatus;
-    $validation->nogeneric = !$nogeneric;
-    $validation->noblock = $isBlocked;
+            // Calculate the results based on the current attribute values
+            $trueCount = (1) // Assuming format validation is always true
+                       + ($domainStatus ? 1 : 0)
+                       + ($nogeneric ? 1 : 0)
+                       + ($isBlocked ? 1 : 0);
 
-    // we should work on the catchall to make it work
-    // $isCatchall = MailCatchall::isCatchAll($email);
-    // $validation->catchall = $isCatchall;
+            // Calculate the percentage
+            $percentage = $trueCount * 25; // Each true attribute contributes 25%
 
-    // Calculate the results based on the current attribute values
-    $validation->results = $this->calculateResults($validation);
+            // Determine the validation status based on conditions
+            $validationStatus = $domainStatus && $nogeneric && $isBlocked;
 
-    // Save the validation instance
-    $validation->save();
+            // Prepare response data
+            $responseData = [
+                'email' => $email,
+                'format' => true, // Assuming format validation is true
+                'domain' => $domainStatus,
+                'nogeneric' => $nogeneric,
+                'noblock' => $isBlocked,
+                'results' => $percentage,
+                'status' => $validationStatus ? 'valid' : 'invalid',
+            ];
 
-    // Return a JSON response with the validation instance
-    return response()->json(['validation' => $validation]);
-}
+            // Return a JSON response with the validation data
+            return response()->json(['validation' => $responseData]);
 
-// Method to calculate results
-private function calculateResults($validation)
-{
-    $trueCount = ($validation->format ? 1 : 0)
-               + ($validation->catchall ? 1 : 0)
-               + ($validation->domain ? 1 : 0)
-               + ($validation->noblock ? 1 : 0)
-               + ($validation->nogeneric ? 1 : 0);
+        } catch (\Exception $e) {
+            // Log the exception and return a JSON error response
+            \Log::error('Validation error: ' . $e->getMessage());
+            return response()->json(['error' => 'An error occurred while processing your request.'], 500);
+        }
+    }
 
-    // Calculate the percentage
-    $percentage = $trueCount * 25; // Each true attribute contributes 25%
+    // Method to check for generic emails
+    private function isGenericEmail($domain)
+    {
+        $genericDomains = [
+            'gmail.com',
+            'yahoo.com',
+            'hotmail.com',
+        ];
 
-    // Cap the percentage at 100
-    return min($percentage, 100);
-}
+        return in_array($domain, $genericDomains);
+    }
 
-// Method to check for generic emails
-private function isGenericEmail($domain)
-{
-    $genericDomains = [
-        'gmail.com',
-        'yahoo.com',
-        'hotmail.com',
-    ];
+    // Method to check for blocked or spam emails
+    private function isEmailBlocked($email)
+    {
+        $blockedEmails = ['blocked@example.com', 'spam@example.com'];
 
-    return in_array($domain, $genericDomains);
-}
+        return in_array($email, $blockedEmails);
+    }
 
-// Method to check for blocked or spam emails
-private function isEmailBlocked($email)
-{
-    $blockedEmails = ['blocked@example.com', 'spam@example.com'];
-
-    return in_array($email, $blockedEmails);
-}
 }
