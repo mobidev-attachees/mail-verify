@@ -77,7 +77,7 @@ class ValidationController extends Controller
             $domainStatus = checkdnsrr($domain, "MX");
 
             // Check if the email is from a generic domain
-            $nogeneric = !$this->isGenericEmail($domain);
+            $generic = $this->isGenericEmail($domain);
 
             // Check if the email is blocked
             $isBlocked = !$this->isEmailBlocked($email);
@@ -85,21 +85,21 @@ class ValidationController extends Controller
             // Calculate the results based on the current attribute values
             $trueCount = (1) // Assuming format validation is always true
                        + ($domainStatus ? 1 : 0)
-                       + ($nogeneric ? 1 : 0)
+                       + ($generic ? 1 : 0)
                        + ($isBlocked ? 1 : 0);
 
             // Calculate the percentage
             $percentage = $trueCount * 25; // Each true attribute contributes 25%
 
             // Determine the validation status based on conditions
-            $validationStatus = $domainStatus && $nogeneric && $isBlocked;
+            $validationStatus = $domainStatus && $generic && $isBlocked;
 
             // Prepare response data
             $responseData = [
                 'email' => $email,
                 'format' => true, // Assuming format validation is true
                 'domain' => $domainStatus,
-                'nogeneric' => $nogeneric,
+                'generic' => $generic,
                 'noblock' => $isBlocked,
                 'results' => $percentage,
                 'status' => $validationStatus ? 'valid' : 'invalid',
@@ -116,7 +116,7 @@ class ValidationController extends Controller
     }
 
     // Method to check for generic emails
-    private function isGenericEmail($domain)
+    private function isGenericEmail($domain): bool
     {
         $genericDomains = [
             'gmail.com',

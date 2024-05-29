@@ -140,7 +140,7 @@ document.addEventListener("DOMContentLoaded", function() {
                     "The domain of the email address is valid and has a valid DNS record.",
                     "The domain of the email address is invalid or does not have a valid DNS record.");
 
-                updateValidationSection("nogeneric", validation.nogeneric, "No Generic", "Generic",
+                updateValidationSection("nogeneric", validation.generic, "No Generic", "Generic",
                     "The email address does not seem to be a generic email address, such as support@, info@, or contact@.",
                     "The email address is from a generic domain.");
 
@@ -198,12 +198,12 @@ document.addEventListener("DOMContentLoaded", function() {
 
         progressBarFormat.style.width = `${validation.format ? 25 : 0}%`;
         progressBarDomain.style.width = `${validation.domain ? 25 : 0}%`;
-        progressBarNoGeneric.style.width = `${validation.nogeneric ? 25 : 0}%`;
+        progressBarNoGeneric.style.width = `${validation.generic ? 25 : 0}%`;
         progressBarNoBlock.style.width = `${validation.noblock ? 25 : 0}%`;
 
         progressBarFormat.setAttribute('aria-valuenow', validation.format ? 25 : 0);
         progressBarDomain.setAttribute('aria-valuenow', validation.domain ? 25 : 0);
-        progressBarNoGeneric.setAttribute('aria-valuenow', validation.nogeneric ? 25 : 0);
+        progressBarNoGeneric.setAttribute('aria-valuenow', validation.generic ? 25 : 0);
         progressBarNoBlock.setAttribute('aria-valuenow', validation.noblock ? 25 : 0);
     }
 });
