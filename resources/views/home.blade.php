@@ -6,17 +6,18 @@
     <div>
         <h3>Validate email.</h3>
         <br>
-        <p>Check emails using our single, API, or batch validation tools.</p>
+        <p>Authenticate emails via our single, API, or batch validation methods.</p>
     </div>
+    <br>
 
     <div style="padding-left:20px;">
         <a href="single">Single</a> &nbsp;&nbsp;
         <a href="API">API</a>&nbsp;&nbsp;
         <a href="batchvalidation">Batch Validation</a>
-        <hr style="height:1px;border-width:0;color:black;background-color:black;">
-    </div>
+       
+    </div> <hr style="height:1px;border-width:0;color:black;background-color:black;">
 
-        <div class="col p-3" style="border-style: solid; border-width: 1px;border-radius: 30px;margin:auto;width: 100%;padding-bottom: 50px;">
+        <div class="col p-3" style="border-style: solid; border-width: 1px;border-radius: 30px;margin:auto;width: 100%;padding-bottom: 50px;" >
                 <form method="POST" action="{{ route('validate.api.mail') }}" id="validateEmailViaApi">
                     @csrf
                     <div class="row mb-3">

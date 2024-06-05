@@ -7,11 +7,10 @@
         <div class="row">
             <div class="col p-3">
                 <h1 style="font-size: 40px;">
-                    Simple email validation
-                    for everyone
+                Effortless Email Address Checking
                 </h1>
                 <p>
-                    Remove fake emails and spam users from your email lists. Validate if an address is valid, and if it can receive email,<b> ⏱️ in under 0.5 seconds.</b>
+                Streamline your email processes with our intuitive validation service, perfect for businesses and individuals alike.</b>
                 </p>
             </div>
             <div class="col p-3" style="border-style: solid; border-width: 1px;border-radius: 30px;margin:auto;width: 100%;padding-bottom: 50px;">
@@ -96,11 +95,11 @@
             <div class="row">
                 <div class="col p-3" style="text-align:center;letter-spacing: -2px;">
                     <h1 style="font-size: 30px;">
-                        “Mail-verify delivers all we need in an email validation service: top,<br> security, scalability, performance, and extensive integrations”.
+                    "For email validation, Mail-verify excels in every aspect: strong security, scalability, impressive performance, and extensive integration options."
                     </h1>
                 </div>
                 <div class="container-fluid" style="text-align:center;font-weight:600;">
-                    A happy customer, probably
+                A satisfied client, no doubt
                 </div>
             </div>
         </div>
