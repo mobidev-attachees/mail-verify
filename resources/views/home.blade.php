@@ -13,7 +13,7 @@
     <div style="padding-left:20px;">
         <a href="single">Single</a> &nbsp;&nbsp;
         <a href="API">API</a>&nbsp;&nbsp;
-        <a href="batchvalidation">Batch Validation</a>
+        <a href="{{route('batchvalidate')}}">Batch Validation</a>
        
     </div> <hr style="height:1px;border-width:0;color:black;background-color:black;">
 

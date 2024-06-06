@@ -134,5 +134,9 @@ class ValidationController extends Controller
 
         return in_array($email, $blockedEmails);
     }
+    public function validateBatchEmails ()
+    {
+        return view('batchvalidation');
+    }
 
 }
