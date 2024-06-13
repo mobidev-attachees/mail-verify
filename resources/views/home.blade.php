@@ -1,6 +1,49 @@
 @extends('layouts.app')
 
 @section('content')
+<style>
+    .tab {
+        overflow: hidden;
+        border: 1px solid #ccc;
+        background-color: #f1f1f1;
+    }
+
+    .tab button {
+        background-color: inherit;
+        float: left;
+        border: none;
+        outline: none;
+        cursor: pointer;
+        padding: 14px 16px;
+        transition: 0.3s;
+        font-size: 17px;
+    }
+
+    .tab button:hover {
+        background-color: #ddd;
+    }
+
+    .tab button.active {
+        background-color: #ccc;
+    }
+
+    .tabcontent {
+        display: none;
+        padding: 6px 12px;
+        border: 1px solid #ccc;
+        border-top: none;
+    }
+
+    .topright {
+        float: right;
+        cursor: pointer;
+        font-size: 28px;
+    }
+
+    .topright:hover {
+        color: red;
+    }
+</style>
 
 <div style="padding-left: 30px; border-width: 2px;">
     <div>
@@ -10,97 +53,124 @@
     </div>
     <br>
 
-    <div style="padding-left:20px;">
-        <a href="single">Single</a> &nbsp;&nbsp;
-        <a href="API">API</a>&nbsp;&nbsp;
-        <a href="{{route('batchvalidate')}}">Batch Validation</a>
-       
-    </div> <hr style="height:1px;border-width:0;color:black;background-color:black;">
+    <div class="tab">
+        <button class="tablinks" onclick="openCity(event, 'single')" id="defaultOpen">single</button>
+        <button class="tablinks" onclick="openCity(event, 'API')">API</button>
+        <button class="tablinks" onclick="openCity(event, 'batchvalidation')">batch validation</button>
+    </div>
 
-        <div class="col p-3" style="border-style: solid; border-width: 1px;border-radius: 30px;margin:auto;width: 100%;padding-bottom: 50px;" >
-                <form method="POST" action="{{ route('validate.api.mail') }}" id="validateEmailViaApi">
-                    @csrf
-                    <div class="row mb-3">
-                        <label for="email" class="col-md-4 col-form-label text-md-end">{{ __('Email Address') }}</label>
-                        <div class="col-md-5">
-                            <input id="email" type="email" class="form-control" name="email" value="{{ old('email') }}" required autocomplete="email" autofocus>
-                            @error('email')
+    <div id="single" class="tabcontent">
+        <span onclick="this.parentElement.style.display='none'" class="topright">&times;</span>
+        <h3>single</h3>
+        <div class="container-fluid mt-3">
+            <div class="row">
+                <div class="col p-3" style="border-style: solid; border-width: 1px;border-radius: 30px;margin:auto;width: 100%;padding-bottom: 50px;">
+                    <form method="POST" action="{{ route('validate.api.mail') }}" id="validateEmailViaApi">
+                        @csrf
+                        <div class="row mb-3">
+                            <label for="email" class="col-md-4 col-form-label text-md-end">{{ __('Email Address') }}</label>
+                            <div class="col-md-5">
+                                <input id="email" type="email" class="form-control" name="email" value="{{ old('email') }}" required autocomplete="email" autofocus>
+                                @error('email')
                                 <span class="invalid-feedback" role="alert">
                                     <strong>{{ $message }}</strong>
                                 </span>
-                            @enderror
+                                @enderror
+                            </div>
+                            <div class="col-md-3">
+                                <button type="submit" class="btn btn-primary">
+                                    {{ __('Check') }}
+                                </button>
+                            </div>
                         </div>
-                        <div class="col-md-3">
-                            <button type="submit" class="btn btn-primary">
-                                {{ __('Check') }}
-                            </button>
+                    </form>
+
+                    <hr style="height:2px;border-width:0;color:gray;background-color:blue;">
+
+                    <!-- Progress Bar -->
+                    <div class="progress mb-3">
+                        <div id="progress-bar-format" class="progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100"></div>
+                        <div id="progress-bar-domain" class="progress-bar bg-success" role="progressbar" aria-valuemin="0" aria-valuemax="100"></div>
+                        <div id="progress-bar-nogeneric" class="progress-bar bg-info" role="progressbar" aria-valuemin="0" aria-valuemax="100"></div>
+                        <div id="progress-bar-noblock" class="progress-bar bg-danger" role="progressbar" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+
+                    <div id="cf-response-message">
+                        <div class="collapse multi-collapse" id="collapse">
+                            <div class="card card-body" id="card"></div>
                         </div>
                     </div>
-                </form>
+                    <div class="row">
+                        <div class="col">
+                            <i id="format-icon" class="fas"></i>
+                            <span id="format-message"></span>
+                            <div class="collapse multi-collapse" id="format-collapse">
+                                <div class="card card-body" id="format-card"></div>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <i id="domain-icon" class="fas"></i>
+                            <span id="domain-message"></span>
+                            <div class="collapse multi-collapse" id="domain-collapse">
+                                <div class="card card-body" id="domain-card"></div>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <i id="nogeneric-icon" class="fas"></i>
+                            <span id="nogeneric-message"></span>
+                            <div class="collapse multi-collapse" id="nogeneric-collapse">
+                                <div class="card card-body" id="nogeneric-card"></div>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <i id="noblock-icon" class="fas"></i>
+                            <span id="noblock-message"></span>
+                            <div class="collapse multi-collapse" id="noblock-collapse">
+                                <div class="card card-body" id="noblock-card"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="cf-response-message"></div>
 
-                <hr style="height:2px;border-width:0;color:gray;background-color:blue;">
+                    <br>
 
-                <!-- Progress Bar -->
-                <div class="progress mb-3">
-                    <div id="progress-bar-format" class="progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100"></div>
-                    <div id="progress-bar-domain" class="progress-bar bg-success" role="progressbar" aria-valuemin="0" aria-valuemax="100"></div>
-                    <div id="progress-bar-nogeneric" class="progress-bar bg-info" role="progressbar" aria-valuemin="0" aria-valuemax="100"></div>
-                    <div id="progress-bar-noblock" class="progress-bar bg-danger" role="progressbar" aria-valuemin="0" aria-valuemax="100"></div>
+                    <hr style="height:2px;border-width:0;color:gray;background-color:blue">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target=".multi-collapse" aria-expanded="false" aria-controls="multiCollapseExample1 multiCollapseExample2">Toggle details</button>
+                        </div>
+                    </div>
+                    <br><br>
                 </div>
-
-                <div id="cf-response-message">
-                    <div class="collapse multi-collapse" id="collapse">
-                        <div class="card card-body" id="card"></div>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col">
-                        <i id="format-icon" class="fas"></i>
-                        <span id="format-message"></span>
-                        <div class="collapse multi-collapse" id="format-collapse">
-                            <div class="card card-body" id="format-card"></div>
-                        </div>
-                    </div>
-                    <div class="col">
-                        <i id="domain-icon" class="fas"></i>
-                        <span id="domain-message"></span>
-                        <div class="collapse multi-collapse" id="domain-collapse">
-                            <div class="card card-body" id="domain-card"></div>
-                        </div>
-                    </div>
-                    <div class="col">
-                        <i id="nogeneric-icon" class="fas"></i>
-                        <span id="nogeneric-message"></span>
-                        <div class="collapse multi-collapse" id="nogeneric-collapse">
-                            <div class="card card-body" id="nogeneric-card"></div>
-                        </div>
-                    </div>
-                    <div class="col">
-                        <i id="noblock-icon" class="fas"></i>
-                        <span id="noblock-message"></span>
-                        <div class="collapse multi-collapse" id="noblock-collapse">
-                            <div class="card card-body" id="noblock-card"></div>
-                        </div>
-                    </div>
-                </div>
-                <div id="cf-response-message"></div>
-
-
-                <br>
-
-                <hr style="height:2px;border-width:0;color:gray;background-color:blue">
-                <div class="row">
-                    <div class="col-md-12">
-                        <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target=".multi-collapse" aria-expanded="false" aria-controls="multiCollapseExample1 multiCollapseExample2">Toggle details</button>
-                    </div>
-                    
-                </div>
-                <br><br>
             </div>
         </div>
-        <br><br>
+    </div>
+
+    <div id="API" class="tabcontent">
+        <span onclick="this.parentElement.style.display='none'" class="topright">&times;</span>
+        <h3>API</h3>
+    </div>
+
+    <div id="batchvalidation" class="tabcontent">
+        <span onclick="this.parentElement.style.display='none'" class="topright">&times;</span>
+        <h3>batch validation</h3>
+        <div style="padding-left: 30px; border-width: 2px;">
+            <div>
+                <h3>bulk email validation</h3>
+                <br>
+            </div>
+            <div class="col p-3" style="border-style: solid; border-width: 1px;border-radius: 30px;margin:auto;width: 100%;padding-bottom: 50px;">
+                <p>Click on the "Choose File" button to upload a file:</p>
+                <form action="/action_page.php">
+                    <input type="file" id="myFile" name="filename">
+                    <input type="submit">
+                </form>
+            </div>
+            </div>
+        </div>
     </div>
 </div>
+
 <script>
 document.addEventListener("DOMContentLoaded", function() {
     document.getElementById("validateEmailViaApi").addEventListener("submit", function(event) {
@@ -202,8 +272,21 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 });
 
+function openCity(evt, cityName) {
+    var i, tabcontent, tablinks;
+    tabcontent = document.getElementsByClassName("tabcontent");
+    for (i = 0; i < tabcontent.length; i++) {
+        tabcontent[i].style.display = "none";
+    }
+    tablinks = document.getElementsByClassName("tablinks");
+    for (i = 0; i < tablinks.length; i++) {
+        tablinks[i].className = tablinks[i].className.replace(" active", "");
+    }
+    document.getElementById(cityName).style.display = "block";
+    evt.currentTarget.className += " active";
+}
 
-
+document.getElementById("defaultOpen").click();
 </script>
 
 @endsection
