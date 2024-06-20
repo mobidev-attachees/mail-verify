@@ -37,7 +37,7 @@
                 <hr style="height:2px;border-width:0;color:gray;background-color:blue;">
 
                 <!-- Progress Bar -->
-                <div class="progress mb-3">
+                <div id="progress-bar-container" class="progress mb-3" style="display:none;">
                     <div id="progress-bar-format" class="progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100"></div>
                     <div id="progress-bar-domain" class="progress-bar bg-success" role="progressbar" aria-valuemin="0" aria-valuemax="100"></div>
                     <div id="progress-bar-nogeneric" class="progress-bar bg-info" role="progressbar" aria-valuemin="0" aria-valuemax="100"></div>
@@ -112,6 +112,8 @@ document.addEventListener("DOMContentLoaded", function() {
         event.preventDefault();
 
         const formData = new FormData(this);
+        document.getElementById("progress-bar-container").style.display = "block";
+
 
         fetch('{{ route('validate.api.mail') }}', {
             method: 'POST',
@@ -204,6 +206,7 @@ document.addEventListener("DOMContentLoaded", function() {
         progressBarDomain.setAttribute('aria-valuenow', validation.domain ? 25 : 0);
         progressBarNoGeneric.setAttribute('aria-valuenow', validation.generic ? 25 : 0);
         progressBarNoBlock.setAttribute('aria-valuenow', validation.noblock ? 25 : 0);
+        
     }
 });
 
